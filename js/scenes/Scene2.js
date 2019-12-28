@@ -37,41 +37,6 @@ class Scene2 extends Phaser.Scene {
       "ship3"
     );
 
-    this.anims.create({
-      key: "ship1_anim",
-      frames: this.anims.generateFrameNumbers("ship1"),
-      frameRate: 20,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "ship2_anim",
-      frames: this.anims.generateFrameNumbers("ship2"),
-      frameRate: 20,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "ship3_anim",
-      frames: this.anims.generateFrameNumbers("ship3"),
-      frameRate: 20,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "red",
-      frames: this.anims.generateFrameNumbers("power-up", { start: 0, end: 1 }),
-      frameRate: 20,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "grey",
-      frames: this.anims.generateFrameNumbers("power-up", { start: 2, end: 3 }),
-      frameRate: 20,
-      repeat: -1
-    });
-
     this.powerUps = this.physics.add.group();
 
     const maxObjects = 4;
@@ -114,6 +79,18 @@ class Scene2 extends Phaser.Scene {
     this.ship3.setInteractive();
 
     this.input.on("gameobjectdown", this.destroyShip, this);
+
+    this.player = this.physics.add.sprite(
+      config.width / 2 - 8,
+      config.height - 64,
+      "player"
+    );
+    this.player.play("thrust");
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
+    this.player.setCollideWorldBounds(true);
+    this.spacebar = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
   }
 
   moveShip(ship, speed) {
@@ -133,10 +110,27 @@ class Scene2 extends Phaser.Scene {
     gameObject.setTexture("explosion");
     gameObject.play("explode");
   }
+
+  movePlayerManager() {
+    if (this.cursorKeys.left.isDown) {
+      this.player.setVelocityX(-gameSettings.playerSpeed);
+    } else if (this.cursorKeys.right.isDown) {
+      this.player.setVelocityX(gameSettings.playerSpeed);
+    }
+    if (this.cursorKeys.up.isDown) {
+      this.player.setVelocityY(-gameSettings.playerSpeed);
+    } else if (this.cursorKeys.down.isDown) {
+      this.player.setVelocityY(gameSettings.playerSpeed);
+    }
+  }
   update() {
     this.moveShip(this.ship1, 1);
     this.moveShip(this.ship2, 2);
     this.moveShip(this.ship3, 3);
     this.background.tilePositionY -= 0.5;
+    this.movePlayerManager();
+    if(Phaser.Input.Keyboard.JustDown(this.spaceBar)){
+      console.log('fire');
+    }
   }
 }
